@@ -28,6 +28,7 @@
 
 NFThreadPoolModule::NFThreadPoolModule(NFIPluginManager* p)
 {
+    m_bIsExecute = true;
 	pPluginManager = p;
 }
 
@@ -35,27 +36,12 @@ NFThreadPoolModule::~NFThreadPoolModule()
 {
 }
 
-void NFThreadPoolModule::SetCpu(const int cpuCount)
-{
-    if (cpuCount > mCPUCount)
-    {
-        mCPUCount = cpuCount;
-        for (int i = mThreadPool.size(); i < mCPUCount * 2; ++i)
-        {
-            mThreadPool.push_back(NF_SHARE_PTR<NFThreadCell>(NF_NEW NFThreadCell(this)));
-        }
-    }
-}
-
 bool NFThreadPoolModule::Init()
 {
-    if (mCPUCount > 0)
-    {
-        for (int i = 0; i < mCPUCount * 2; ++i)
-        {
-            mThreadPool.push_back(NF_SHARE_PTR<NFThreadCell>(NF_NEW NFThreadCell(this)));
-        }
-    }
+	for (int i = 0; i < pPluginManager->GetAppCPUCount(); ++i)
+	{
+		mThreadPool.push_back(NF_SHARE_PTR<NFThreadCell>(NF_NEW NFThreadCell(this)));
+	}
 
     return true;
 }
@@ -84,7 +70,7 @@ bool NFThreadPoolModule::Execute()
     return true;
 }
 
-void NFThreadPoolModule::DoAsyncTask(const NFGUID taskID, const std::string & data, TASK_PROCESS_FUNCTOR_PTR asyncFunctor, TASK_PROCESS_FUNCTOR_PTR functor_end)
+void NFThreadPoolModule::DoAsyncTask(const NFGUID taskID, const std::string & data, TASK_PROCESS_FUNCTOR asyncFunctor, TASK_PROCESS_FUNCTOR functor_end)
 {
 	NFThreadTask task;
 	task.nTaskID = taskID;
@@ -109,7 +95,7 @@ void NFThreadPoolModule::ExecuteTaskResult()
 	{
 		if (xMsg.xEndFunc)
 		{
-			xMsg.xEndFunc->operator()(xMsg);
+			xMsg.xEndFunc.operator()(xMsg);
 		}
 	}
 }

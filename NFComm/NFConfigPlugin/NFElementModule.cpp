@@ -45,7 +45,7 @@ NFElementModule::NFElementModule(NFIPluginManager* p)
 
 	if (!this->mbBackup)
 	{
-		for (int i = 0; i < 10; ++i)
+		for (int i = 0; i < pPluginManager->GetAppCPUCount(); ++i)
 		{
 			ThreadElementModule threadElement;
 			threadElement.used = false;
@@ -216,8 +216,7 @@ bool NFElementModule::CheckRef()
 						const std::string& strRefValue= this->GetPropertyString(strId, pProperty->GetKey());
 						if (!strRefValue.empty() && !this->GetElement(strRefValue))
 						{
-							std::string msg;
-							msg.append("check ref failed id:").append(strRefValue).append(", in ").append(pLogicClass->GetClassName());
+							std::string msg = "check ref failed id:" + strRefValue + ", in " + pLogicClass->GetClassName() + "=>" + strId;
 							NFASSERT(nRet, msg.c_str(), __FILE__, __FUNCTION__);
 
 							m_pLogModule->LogError(msg, __FUNCTION__, __LINE__);
@@ -467,7 +466,6 @@ const NFVector3 NFElementModule::GetPropertyVector3(const std::string & strConfi
 		return pProperty->GetVector3();
 	}
 
-
 	return NFVector3();
 }
 
@@ -691,9 +689,4 @@ bool NFElementModule::Clear()
 
     mbLoaded = false;
     return true;
-}
-
-NFIElementModule *NFElementModule::GetThreadElementModule(const int index)
-{
-	return mThreadElements[index].elementModule;
 }

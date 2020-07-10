@@ -170,6 +170,19 @@ public:
 		return NULL;
 	}
 
+	template <typename T>
+	void ReplaceModule(NFIModule* pModule)
+	{
+		NFIModule* pLogicModule = FindModule(typeid(T).name());
+		if (pLogicModule)
+		{
+			RemoveModule(typeid(T).name());
+		}
+
+
+		AddModule(typeid(T).name(), pModule);
+	};
+
 	virtual bool ReLoadPlugin(const std::string& strPluginDLLName) = 0;
 
     virtual void Registered(NFIPlugin* plugin) = 0;
@@ -220,6 +233,8 @@ public:
 	virtual void SetCurrentPlugin(NFIPlugin* pPlugin) = 0;
 	virtual void SetCurrentModule(NFIModule* pModule) = 0;
 
+	virtual int GetAppCPUCount() const = 0;
+	virtual void SetAppCPUCount(const int count) = 0;
 
 	virtual void SetGetFileContentFunctor(GET_FILECONTENT_FUNCTOR fun) = 0;
 	virtual bool GetFileContent(const std::string &strFileName, std::string &strContent) = 0;
